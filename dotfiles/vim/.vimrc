@@ -1,46 +1,103 @@
-" Main configuration
+" show line numbers
+set number
 
-set noncompatible
-let mapleader = " "
-setbackspace=2
-set mouse=a
+" Enable filetype plugins
+filetype plugin on
+filetype indent on
+
+" Set to auto read when a file is changed from the outside
+set autoread
+au FocusGained,BufEnter * checktime
+
+" Always show current position
 set ruler
-set showcmd
-set laststatus=2
-set autowrite
 
+" Configure backspace so it acts as it should act
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
 
-" Load plugins
+" Ignore case when searching
+set ignorecase
 
-call plug#begin('~/.vim/plugged')
-Plug 'fatih/vim-go'
-call plug#end()
+" When searching try to be smart about cases
+set smartcase
 
+" Highlight search results
+set hlsearch
 
-" Indentations and Spacing
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
 
-filetype plugin indent on
-set tabstop=2
-set shiftwidth=2
-set shiftround
+" Show matching brackets when text indicator is over them
+set showmatch
+
+" No annoying sound on errors
+set noerrorbells
+set novisualbell
+set t_vb=
+set tm=500
+
+" Properly disable sound on errors on MacVim
+if has("gui_macvim")
+    autocmd GUIEnter * set vb t_vb=
+endif
+
+" Enable syntax highlighting
+syntax enable
+
+" color scheme
+try
+    colorscheme desert
+catch
+endtry
+
+set background=dark
+
+" Set utf8 as standard encoding and en_US as the standard language
+set encoding=utf8
+
+" Use Unix as the standard file type
+set ffs=unix,dos,mac
+
+" Use spaces instead of tabs
 set expandtab
-set list listchars=tab:»·,trail:·,nbsp:·" display extra whitespace
-set nojoinspaces " Use one space after punctuation
-set textwidth=80
-set colorcolumn=+1
-set relativenumber number
-set numberwidth=5
 
-function! InsertTabWrapper()
-  let col = col('.') - 1
-  if !col || getline('.')[col - 1] !~ '\k'
-    return "\<tab>"
-  else
-    return "\<c-p>"
-  endif
+" Be smart when using tabs ;)
+set smarttab
+
+" 1 tab == 4 spaces
+set shiftwidth=4
+set tabstop=4
+
+set ai "Auto indent
+set si "Smart indent
+
+" Always show the status line
+set laststatus=2
+
+" Format the status line
+set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l\ \ Column:\ %c
+
+" Returns true if paste mode is enabled
+function! HasPaste()
+    if &paste
+        return 'PASTE MODE  '
+    endif
+    return ''
 endfunction
 
-inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
-inoremap <S-Tab> <c-n>
+" Delete trailing white space on save, useful for some filetypes ;)
+fun! CleanExtraSpaces()
+    let save_cursor = getpos(".")
+    let old_query = getreg('/')
+    silent! %s/\s\+$//e
+    call setpos('.', save_cursor)
+    call setreg('/', old_query)
+endfun
+
+if has("autocmd")
+    autocmd BufWritePre *.txt,*.js,*.py,*.wiki,*.sh,*.coffee :call CleanExtraSpaces()
+endif
+
 
 
