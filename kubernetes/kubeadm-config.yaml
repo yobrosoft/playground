@@ -1,0 +1,14 @@
+---
+kind: ClusterConfiguration
+apiVersion: kubeadm.k8s.io/v1beta3
+kubernetesVersion: v1.23.0
+controlPlaneEndpoint: 192.168.0.100:6443
+clusterName: playgroud-k8s
+controllerManager:
+  extraArgs:
+    cluster-cidr: 192.168.0.100/24
+    allocate-node-cidrs: "true"
+---
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+cgroupDriver: systemd
